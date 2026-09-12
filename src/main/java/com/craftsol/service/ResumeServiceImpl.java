@@ -14,9 +14,11 @@ import java.util.stream.Collectors;
 public class ResumeServiceImpl implements ResumeService {
 
     private final ResumeRepository resumeRepository;
+    private final ResumePdfGenerator resumePdfGenerator;
 
-    public ResumeServiceImpl(ResumeRepository resumeRepository) {
+    public ResumeServiceImpl(ResumeRepository resumeRepository, ResumePdfGenerator resumePdfGenerator) {
         this.resumeRepository = resumeRepository;
+        this.resumePdfGenerator = resumePdfGenerator;
     }
 
     @Override
@@ -139,6 +141,14 @@ public class ResumeServiceImpl implements ResumeService {
         Resume resume = resumeRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Resume not found with id: " + id));
         resumeRepository.delete(resume);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] generatePdf(Long id, String template) {
+        Resume resume = resumeRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Resume not found with id: " + id));
+        return resumePdfGenerator.generate(toDto(resume), template);
     }
 
     private Resume toEntity(ResumeDto dto) {

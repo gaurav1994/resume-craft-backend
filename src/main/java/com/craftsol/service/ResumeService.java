@@ -10,4 +10,5 @@ public interface ResumeService {
     ResumeDto create(ResumeDto dto);
     ResumeDto update(Long id, ResumeDto dto);
     void delete(Long id);
+    byte[] generatePdf(Long id, String template);
 }
