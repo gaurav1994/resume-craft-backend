@@ -22,9 +22,9 @@ public class ResumePdfGenerator {
     private static final String DEFAULT_TEMPLATE = "orange";
     private static final float PAGE_WIDTH = PDRectangle.A4.getWidth();
     private static final float PAGE_HEIGHT = PDRectangle.A4.getHeight();
-    private static final float LEFT_MARGIN = 50f;
-    private static final float RIGHT_MARGIN = 50f;
-    private static final float SECTION_TOP_MARGIN = 12f;
+    private static final float LEFT_MARGIN = 40f;
+    private static final float RIGHT_MARGIN = 40f;
+    private static final float SECTION_TOP_MARGIN = 8f;
 
     public static int countVisibleSections(ResumeDto resume) {
         if (resume == null) {
@@ -198,12 +198,14 @@ public class ResumePdfGenerator {
         y -= 22f;
 
         for (ExperienceDto experience : resume.getExperience()) {
-            String title = safe(experience.getDesignation()) + " at " + safe(experience.getCompany()) + "  " + safe(experience.getDate());
+            String title = safe(experience.getDesignation()) + " at " + safe(experience.getCompany());
+            String period = safe(experience.getDate());
             y -= 16f;
             if (y < 50f) {
                 return y;
             }
             writeText(stream, theme.headingFont, 11, LEFT_MARGIN, y, title, theme.primaryColor);
+            writeRightAlignedText(stream, theme.headingFont, 11, y, period, theme.primaryColor);
 
             List<String> lines = wrapText(theme.bodyFont, 10, PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN, safe(experience.getDetails()));
             for (String line : lines) {
@@ -228,12 +230,14 @@ public class ResumePdfGenerator {
         y -= 22f;
 
         for (ProjectDto project : resume.getProjects()) {
-            String title = safe(project.getProjectTitle()) + " (" + safe(project.getDate()) + ")";
+            String title = safe(project.getProjectTitle());
+            String period = safe(project.getDate());
             y -= 16f;
             if (y < 50f) {
                 return y;
             }
             writeText(stream, theme.headingFont, 11, LEFT_MARGIN, y, title, theme.primaryColor);
+            writeRightAlignedText(stream, theme.headingFont, 11, y, period, theme.primaryColor);
 
             List<String> urlLines = wrapText(theme.bodyFont, 10, PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN, safe(project.getUrl()));
             for (String line : urlLines) {
@@ -267,12 +271,14 @@ public class ResumePdfGenerator {
         y -= 22f;
 
         for (EducationDto education : resume.getEducation()) {
-            String title = safe(education.getDegree()) + " - " + safe(education.getInstitute()) + " (" + safe(education.getDate()) + ")";
+            String title = safe(education.getDegree()) + " - " + safe(education.getInstitute());
+            String period = safe(education.getDate());
             y -= 16f;
             if (y < 50f) {
                 return y;
             }
             writeText(stream, theme.headingFont, 11, LEFT_MARGIN, y, title, theme.primaryColor);
+            writeRightAlignedText(stream, theme.headingFont, 11, y, period, theme.primaryColor);
 
             List<String> detailLines = wrapText(theme.bodyFont, 10, PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN, safe(education.getDetails()));
             for (String line : detailLines) {
@@ -309,12 +315,23 @@ public class ResumePdfGenerator {
     }
 
     private void drawSectionHeading(PDPageContentStream stream, String title, float y, Theme theme) throws IOException {
-        writeText(stream, theme.headingFont, 14, 50f, y, title, theme.primaryColor);
+        writeText(stream, theme.headingFont, 14, LEFT_MARGIN, y, title, theme.primaryColor);
         stream.setStrokingColor(new Color(200,200,200));
         stream.setLineWidth(1f);
-        stream.moveTo(50f, y - 8f);
-        stream.lineTo(560f, y - 8f);
+        stream.moveTo(LEFT_MARGIN, y - 8f);
+        stream.lineTo(PAGE_WIDTH - RIGHT_MARGIN, y - 8f);
         stream.stroke();
+    }
+
+    private void writeRightAlignedText(PDPageContentStream stream, PDFont font, float size, float y, String value, Color color) throws IOException {
+        String text = safe(value);
+        if (text.isBlank()) {
+            return;
+        }
+
+        float textWidth = font.getStringWidth(text) / 1000f * size;
+        float x = PAGE_WIDTH - RIGHT_MARGIN - textWidth;
+        writeText(stream, font, size, x, y, text, color);
     }
 
     private void writeText(PDPageContentStream stream, PDFont font, float size, float x, float y, String value, Color color) throws IOException {
@@ -357,6 +374,6 @@ public class ResumePdfGenerator {
         return value == null ? "" : value;
     }
 
-    private record Theme(String name, Color primaryColor, Color lightColor, Color fillColor, PDFont titleFont, PDFont bodyFont, PDFont headingFont) {
+    public record Theme(String name, Color primaryColor, Color lightColor, Color fillColor, PDFont titleFont, PDFont bodyFont, PDFont headingFont) {
     }
 }
