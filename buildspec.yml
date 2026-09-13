@@ -32,6 +32,11 @@ phases:
       - echo "Frontend build command placeholder"
       - echo "Upload static frontend assets directly from your frontend repo to S3 during deploy stage"
 
+  post_build:
+    commands:
+      - echo "Triggering ECS service deployment from the freshly pushed ECR image"
+      - aws ecs update-service --cluster resume-craft-cluster --service resume-craft-backend --force-new-deployment --region ap-south-1
+
 artifacts:
   files:
     - imagedefinitions.json
