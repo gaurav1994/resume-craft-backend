@@ -13,6 +13,7 @@ phases:
     commands:
       - echo "Login to ECR"
       - aws --version
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
 
   build:
