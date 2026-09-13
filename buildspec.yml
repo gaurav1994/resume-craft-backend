@@ -22,11 +22,11 @@ phases:
 
       - echo "Building backend docker image"
       - docker build -t resume-craft-backend .
-      - docker tag resume-craft-backend:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/resume-craft-backend:latest
-      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/resume-craft-backend:latest
+      - docker tag resume-craft-backend:latest ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/resume-craft-backend:latest
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/resume-craft-backend:latest
 
       - echo "Creating image definitions"
-      - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/resume-craft-backend:latest" > imagedefinitions.json
+      - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/resume-craft-backend:latest" > imagedefinitions.json
 
       - echo "Frontend build command placeholder"
       - echo "Upload static frontend assets directly from your frontend repo to S3 during deploy stage"
