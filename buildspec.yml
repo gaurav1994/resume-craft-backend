@@ -1,0 +1,37 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+      nodejs: 20
+    commands:
+      - echo "Installing Maven wrapper dependencies"
+      - chmod +x ./mvnw
+
+  pre_build:
+    commands:
+      - echo "Login to ECR"
+      - aws --version
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com
+
+  build:
+    commands:
+      - echo "Building backend jar"
+      - ./mvnw clean package -DskipTests
+
+      - echo "Building backend docker image"
+      - docker build -t resume-craft-backend .
+      - docker tag resume-craft-backend:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/resume-craft-backend:latest
+      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/resume-craft-backend:latest
+
+      - echo "Creating image definitions"
+      - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/resume-craft-backend:latest" > imagedefinitions.json
+
+      - echo "Frontend build command placeholder"
+      - echo "Upload static frontend assets directly from your frontend repo to S3 during deploy stage"
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - target/*.jar
