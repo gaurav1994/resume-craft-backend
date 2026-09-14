@@ -4,7 +4,6 @@ phases:
   install:
     runtime-versions:
       java: corretto21
-      nodejs: 20
     commands:
       - echo "Installing Maven wrapper dependencies"
       - chmod +x ./mvnw
@@ -21,6 +20,7 @@ phases:
 
   build:
     commands:
+      - echo Build started on `date`
       - echo "Building backend jar"
       - ./mvnw clean package -DskipTests
 
@@ -43,3 +43,7 @@ artifacts:
   files:
     - imagedefinitions.json
     - target/*.jar
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
