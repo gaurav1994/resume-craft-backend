@@ -29,13 +29,12 @@ phases:
       - echo "Creating image definitions"
       - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/resume-craft-backend:latest" > imagedefinitions.json
 
-      - echo "Frontend build command placeholder"
-      - echo "Upload static frontend assets directly from your frontend repo to S3 during deploy stage"
+      - echo "Backend build command placeholder, Build Phase Success!"
 
-  post_build:
-    commands:
-      - echo "Triggering ECS service deployment from the freshly pushed ECR image"
-      - aws ecs update-service --cluster resume-craft-cluster --service resume-craft-backend --force-new-deployment --region ap-south-1
+  # post_build:
+  #   commands:
+  #     - echo "Triggering ECS service deployment from the freshly pushed ECR image"
+  #     - aws ecs update-service --cluster resume-craft-cluster --service resume-craft-backend --force-new-deployment --region ap-south-1
 
 artifacts:
   files:
