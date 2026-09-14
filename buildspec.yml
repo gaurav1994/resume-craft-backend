@@ -32,6 +32,9 @@ phases:
       - echo "Creating image definitions"
       - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${IMAGE_REPO}:${IMAGE_TAG}" > imagedefinitions.json
 
+      - echo "Preparing task definition template with the built ECR image"
+      - sed -e "s|REPLACE_IMAGE_URI|${IMAGE_REPO}:${IMAGE_TAG}|g" taskdef.json > taskdef.rendered.json
+
       - echo "Backend build command placeholder, Build Phase Success!"
 
   # post_build:
@@ -42,6 +45,8 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
+    - taskdef.rendered.json
+    - taskdef.json
     - target/*.jar
 
 cache:

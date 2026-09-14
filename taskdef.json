@@ -1,0 +1,40 @@
+{
+  "family": "resume-craft-backend",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "executionRoleArn": "arn:aws:iam::111122223333:role/ecsTaskExecutionRole",
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "resume-craft-backend",
+      "image": "REPLACE_IMAGE_URI",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "prod"
+        },
+        {
+          "name"  : "SERVER_PORT",
+          "value" : "8080"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/resume-craft-backend",
+          "awslogs-region": "ap-south-1",
+          "awslogs-stream-prefix": "resume-craft-backend"
+        }
+      }
+    }
+  ]
+}
