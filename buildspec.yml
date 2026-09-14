@@ -14,7 +14,8 @@ phases:
       - echo "Login to ECR"
       - aws --version
       - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-      - export COMMIT_ID=$(git rev-parse --short=7 HEAD)
+      - export COMMIT_ID=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - export IMAGE_TAG=${COMMIT_ID:-latest}
       - export IMAGE_REPO=${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com/resume-craft-backend
       - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.ap-south-1.amazonaws.com
 
@@ -23,13 +24,13 @@ phases:
       - echo "Building backend jar"
       - ./mvnw clean package -DskipTests
 
-      - echo "Building backend docker image with commit tag ${COMMIT_ID}"
-      - docker build -t resume-craft-backend:${COMMIT_ID} .
-      - docker tag resume-craft-backend:${COMMIT_ID} ${IMAGE_REPO}:${COMMIT_ID}
-      - docker push ${IMAGE_REPO}:${COMMIT_ID}
+      - echo "Building backend docker image with commit tag ${IMAGE_TAG}"
+      - docker build -t resume-craft-backend:${IMAGE_TAG} .
+      - docker tag resume-craft-backend:${IMAGE_TAG} ${IMAGE_REPO}:${IMAGE_TAG}
+      - docker push ${IMAGE_REPO}:${IMAGE_TAG}
 
       - echo "Creating image definitions"
-      - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${IMAGE_REPO}:${COMMIT_ID}" > imagedefinitions.json
+      - printf '[{"name":"resume-craft-backend","imageUri":"%s"}]' "${IMAGE_REPO}:${IMAGE_TAG}" > imagedefinitions.json
 
       - echo "Backend build command placeholder, Build Phase Success!"
 
