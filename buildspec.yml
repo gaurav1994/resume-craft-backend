@@ -45,8 +45,6 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
-    - taskdef.rendered.json
-    - taskdef.json
     - target/*.jar
 
 cache:
